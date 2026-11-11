@@ -1,6 +1,6 @@
-# Proyecto Grupo 4 - SASPe
+# SASPe
 
-Simulador en Python de la red de sensores sísmicos del Perú.
+Proyecto Estructura de Datos Grupo 4 - Simulador en Python de la red de sensores sísmicos del Perú.
 
 ## Requisitos
 - Python 3.12.10
