@@ -190,43 +190,9 @@ class SistemaSASPe:
         return todas
 
     def obtener_ruta_red(self, origen, destino):
-        """Calcula la ruta y costo entre dos sensores en la red operativa."""
-        red = self.obtener_red_operativa()
-
-        ady = {}
-        for sensor in self.grafo.vertices:
-            ady[sensor.id] = []
-
-        for arista in red:
-            ady[arista.origen].append((arista.destino, arista.costo))
-            ady[arista.destino].append((arista.origen, arista.costo))
-
-        # BFS para encontrar camino y registrar predecesores
-        cola = [origen]
-        visitados = {origen}
-        predecesores = {origen: None}
-        costos = {origen: 0.0}
-
-        encontrado = False
-        while cola:
-            actual = cola.pop(0)
-            if actual == destino:
-                encontrado = True
-                break
-            for vecino, costo in ady.get(actual, []):
-                if vecino not in visitados:
-                    visitados.add(vecino)
-                    predecesores[vecino] = actual
-                    costos[vecino] = costos[actual] + costo
-                    cola.append(vecino)
-
-        if not encontrado:
-            return None
-
-        ruta = reconstruir_ruta(predecesores, origen, destino)
-        if ruta is None:
-            return None
-        return ruta, costos[destino]
+        """Ruta de menor costo (Dijkstra) sobre la red operativa."""
+        red = self._grafo_desde_aristas(self.obtener_red_operativa())
+        return ruta_optima(red, origen, destino)
 
 
 # ----------------------------------------------------------------------
