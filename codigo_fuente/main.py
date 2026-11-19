@@ -31,6 +31,9 @@ from codigo_fuente.automata_sensor import (
 )
 from codigo_fuente.simulacion_alerta import SimuladorAlerta, reconstruir_ruta
 
+from codigo_fuente.dijkstra import ruta_optima
+from codigo_fuente.respaldos import seleccionar_respaldos
+
 # Importación tolerante de la Red Neuronal MLP
 try:
     from codigo_fuente.modelo_mlp import cargar_o_entrenar, ModeloCostoMLP
