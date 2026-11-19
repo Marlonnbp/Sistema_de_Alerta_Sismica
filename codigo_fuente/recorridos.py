@@ -47,8 +47,7 @@ def bfs_camino(grafo, origen_id, destino_id):
         for arista in aristas_adyacentes:
             vecino = arista.destino if arista.origen == actual else arista.origen
             
-            if vecino not in visitados:
-                visitados.add(visitado) 
+            if vecino not in visitados: 
                 visitados.add(vecino)
                 predecesores[vecino] = actual
                 cola.encolar(vecino)
