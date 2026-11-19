@@ -1,7 +1,7 @@
 import unittest
 from codigo_fuente.grafo import Grafo
 from codigo_fuente.nodo import NodoSensor
-from codigo_fuente.recorridos import bfs_saltos
+from codigo_fuente.recorridos import bfs_saltos, bfs_camino
 
 class TestRecorridos(unittest.TestCase):
     
@@ -25,6 +25,28 @@ class TestRecorridos(unittest.TestCase):
         self.assertEqual(distancias["S02"], 1)
         self.assertEqual(distancias["S03"], 2)
         self.assertEqual(distancias["S04"], 3)
+
+    def test_bfs_camino_normal(self):
+        camino = bfs_camino(self.grafo, "S01", "S04")
+        self.assertEqual(camino, ["S01", "S02", "S03", "S04"])
+
+    def test_bfs_camino_en_sentido_inverso(self):
+        camino = bfs_camino(self.grafo, "S04", "S01")
+        self.assertEqual(camino, ["S04", "S03", "S02", "S01"])
+
+    def test_bfs_camino_origen_igual_destino(self):
+        camino = bfs_camino(self.grafo, "S02", "S02")
+        self.assertEqual(camino, ["S02"])
+
+    def test_bfs_camino_destino_inexistente(self):
+        camino = bfs_camino(self.grafo, "S01", "S99")
+        self.assertEqual(camino, [])
+
+    def test_bfs_camino_sin_ruta_a_sensor_aislado(self):
+        aislado = NodoSensor("S05", "Tacna", -18.0, -70.2, 562, 5, 2)
+        self.grafo.agregar_vertice(aislado)
+        camino = bfs_camino(self.grafo, "S01", "S05")
+        self.assertEqual(camino, [])
 
 if __name__ == "__main__":
     unittest.main()
