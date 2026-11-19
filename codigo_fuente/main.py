@@ -148,32 +148,31 @@ class SistemaSASPe:
             g.agregar_arista(a.origen, a.destino, a.costo)
         return g
 
-    def construir_red(self, cantidad_respaldos=3):
-        """3. Construye el árbol de Kruskal y añade enlaces de respaldo."""
+    def construir_red(self, cantidad_respaldos=8):
+        """Construye el árbol de Kruskal y añade los respaldos de RN-05."""
         if not self.costos_calculados:
             self.calcular_costos_red(usar_mlp=True)
 
-        # 1. Ejecutar Kruskal para el Árbol de Expansión Mínima
         self.arbol_mst, self.costo_mst = kruskal(self.grafo)
 
-        # 2. Identificar aristas que no están en el árbol como candidatas a respaldo
-        aristas_arbol = set()
+        # seleccionar_respaldos mide saltos con BFS, así que necesita un Grafo solo con el árbol
+        grafo_base = self._grafo_desde_aristas(self.arbol_mst)
+
+        # El Grafo guarda siempre el menor ID como origen, no hace falta sorted
+        en_arbol = set()
         for a in self.arbol_mst:
-            menor, mayor = sorted((a.origen, a.destino))
-            aristas_arbol.add((menor, mayor))
+            en_arbol.add((a.origen, a.destino))
 
-        candidatas_respaldo = []
+        descartadas = []
         for a in self.grafo.aristas:
-            menor, mayor = sorted((a.origen, a.destino))
-            if (menor, mayor) not in aristas_arbol:
-                candidatas_respaldo.append(a)
+            if (a.origen, a.destino) not in en_arbol:
+                descartadas.append(a)
 
-        # Ordenar candidatas por menor costo
-        candidatas_respaldo.sort()
+        elegidos = seleccionar_respaldos(grafo_base, descartadas, cantidad_respaldos)
 
         self.enlaces_respaldo = ListaEnlazada()
         self.costo_respaldo = 0.0
-        for arista in candidatas_respaldo[:cantidad_respaldos]:
+        for arista in elegidos:
             self.enlaces_respaldo.agregar_al_final(arista)
             self.costo_respaldo += arista.costo
 
