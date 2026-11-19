@@ -301,13 +301,15 @@ def opcion_3_construir_red(sistema: SistemaSASPe):
         sistema.cargar_sensores(silencioso=True)
 
     print("\nParámetros de diseño de la red:")
-    resp_input = input("¿Cuántos enlaces de respaldo desea agregar? [Por defecto 3]: ").strip()
+    resp_input = input("¿Cuántos enlaces de respaldo desea agregar? [0-15, por defecto 8]: ").strip()
     try:
-        n_resp = int(resp_input) if resp_input else 3
-        if n_resp < 0:
-            n_resp = 3
+        n_resp = int(resp_input) if resp_input else 8
+        if not 0 <= n_resp <= 15:
+            print("Valor fuera de rango (0 a 15). Se usará 8.")
+            n_resp = 8
     except ValueError:
-        n_resp = 3
+        print("Valor no válido. Se usará 8.")
+        n_resp = 8
 
     print(f"\nEjecutando algoritmo de Kruskal y seleccionando {n_resp} enlaces de respaldo...")
     arbol, respaldos = sistema.construir_red(cantidad_respaldos=n_resp)
