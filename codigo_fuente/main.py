@@ -139,6 +139,15 @@ class SistemaSASPe:
         self.enlaces_respaldo = ListaEnlazada()
         return True
 
+    def _grafo_desde_aristas(self, aristas):
+        """Grafo nuevo con los mismos sensores y solo las aristas dadas."""
+        g = Grafo()
+        for sensor in self.grafo.vertices:
+            g.agregar_vertice(sensor)
+        for a in aristas:
+            g.agregar_arista(a.origen, a.destino, a.costo)
+        return g
+
     def construir_red(self, cantidad_respaldos=3):
         """3. Construye el árbol de Kruskal y añade enlaces de respaldo."""
         if not self.costos_calculados:
