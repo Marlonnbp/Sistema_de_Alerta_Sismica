@@ -1,66 +1,66 @@
-from codigo_fuente.cola import Cola  # Tu cola propia
+from codigo_fuente.cola import Cola
+from codigo_fuente.tabla_hash import TablaHash
+
 
 def bfs_saltos(grafo, origen_id):
-    distancias = {origen_id: 0}
-    visitados = {origen_id}
-    
+    """Devuelve una TablaHash {id_sensor: saltos desde origen_id}.
+    Los sensores inalcanzables no aparecen en la tabla."""
+    distancias = TablaHash()
+    distancias.insertar(origen_id, 0)
+
     cola = Cola()
     cola.encolar(origen_id)
-    
+
     while not cola.esta_vacia():
         actual = cola.desencolar()
-        distancia_actual = distancias[actual]
-        
-        # Obtenemos la ListaEnlazada de Aristas adyacentes al nodo actual
-        aristas_adyacentes = grafo.obtener_vecinos(actual)
-        
-        for arista in aristas_adyacentes:
+        distancia_actual = distancias.buscar(actual)
+
+        for arista in grafo.obtener_vecinos(actual):
             vecino = arista.destino if arista.origen == actual else arista.origen
-            
-            if vecino not in visitados:
-                visitados.add(vecino)
-                distancias[vecino] = distancia_actual + 1
+
+            # la propia tabla de distancias hace de conjunto de visitados
+            if not distancias.contiene(vecino):
+                distancias.insertar(vecino, distancia_actual + 1)
                 cola.encolar(vecino)
-                
+
     return distancias
 
 
 def bfs_camino(grafo, origen_id, destino_id):
+    """Devuelve la lista de ids del camino con menos saltos, o [] si no existe."""
     if origen_id not in grafo.adyacencias or destino_id not in grafo.adyacencias:
         return []
-        
-    visitados = {origen_id}
-    predecesores = {origen_id: None}
-    
+
+    predecesores = TablaHash()
+    predecesores.insertar(origen_id, None)
+
     cola = Cola()
     cola.encolar(origen_id)
-    
+
     encontrado = False
     while not cola.esta_vacia():
         actual = cola.desencolar()
-        
+
         if actual == destino_id:
             encontrado = True
             break
-            
-        aristas_adyacentes = grafo.obtener_vecinos(actual)
-        for arista in aristas_adyacentes:
+
+        for arista in grafo.obtener_vecinos(actual):
             vecino = arista.destino if arista.origen == actual else arista.origen
-            
-            if vecino not in visitados: 
-                visitados.add(vecino)
-                predecesores[vecino] = actual
+
+            if not predecesores.contiene(vecino):
+                predecesores.insertar(vecino, actual)
                 cola.encolar(vecino)
-                
+
     if not encontrado:
         return []
-        
-    # Reconstrucción de la ruta
+
+    # Reconstruccion de la ruta
     camino = []
-    curr = destino_id
-    while curr is not None:
-        camino.append(curr)
-        curr = predecesores[curr]
-        
+    actual = destino_id
+    while actual is not None:
+        camino.append(actual)
+        actual = predecesores.buscar(actual)
+
     camino.reverse()
     return camino
