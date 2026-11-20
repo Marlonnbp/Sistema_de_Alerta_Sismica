@@ -24,7 +24,9 @@ def seleccionar_respaldos(grafo_base, aristas_descartadas, R=8):
 
         # Calculamos los saltos en el árbol base usando el BFS del grafo adaptado
         distancias_desde_u = bfs_saltos(grafo_base, u)
-        saltos = distancias_desde_u.get(v, float('inf'))
+        saltos = distancias_desde_u.buscar(v)
+        if saltos is None:
+            saltos = float('inf')
 
         # (a) Excluir los que unen sensores a menos de 3 saltos en el árbol
         if saltos < 3:
