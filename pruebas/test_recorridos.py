@@ -21,10 +21,17 @@ class TestRecorridos(unittest.TestCase):
 
     def test_bfs_saltos(self):
         distancias = bfs_saltos(self.grafo, "S01")
-        self.assertEqual(distancias["S01"], 0)
-        self.assertEqual(distancias["S02"], 1)
-        self.assertEqual(distancias["S03"], 2)
-        self.assertEqual(distancias["S04"], 3)
+        self.assertEqual(distancias.buscar("S01"), 0)
+        self.assertEqual(distancias.buscar("S02"), 1)
+        self.assertEqual(distancias.buscar("S03"), 2)
+        self.assertEqual(distancias.buscar("S04"), 3)
+
+    def test_bfs_saltos_sensor_inalcanzable(self):
+        aislado = NodoSensor("S05", "Tacna", -18.0, -70.2, 562, 5, 2)
+        self.grafo.agregar_vertice(aislado)
+        distancias = bfs_saltos(self.grafo, "S01")
+        self.assertFalse(distancias.contiene("S05"))
+        self.assertIsNone(distancias.buscar("S05"))
 
     def test_bfs_camino_normal(self):
         camino = bfs_camino(self.grafo, "S01", "S04")
