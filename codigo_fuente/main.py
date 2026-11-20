@@ -159,14 +159,14 @@ class SistemaSASPe:
         grafo_base = self._grafo_desde_aristas(self.arbol_mst)
 
         # El Grafo guarda siempre el menor ID como origen, no hace falta sorted
-        en_arbol = set()
+        en_arbol = TablaHash()
         for a in self.arbol_mst:
-            en_arbol.add((a.origen, a.destino))
+            en_arbol.insertar(a.origen + "|" + a.destino, True)
 
-        descartadas = []
+        descartadas = ListaEnlazada()
         for a in self.grafo.aristas:
-            if (a.origen, a.destino) not in en_arbol:
-                descartadas.append(a)
+            if not en_arbol.contiene(a.origen + "|" + a.destino):
+                descartadas.agregar_al_final(a)
 
         elegidos = seleccionar_respaldos(grafo_base, descartadas, cantidad_respaldos)
 
