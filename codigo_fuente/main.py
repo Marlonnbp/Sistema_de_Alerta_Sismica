@@ -29,7 +29,7 @@ from codigo_fuente.automata_sensor import (
     UMBRALES_POR_SUELO,
     umbral_de_suelo,
 )
-from codigo_fuente.simulacion_alerta import SimuladorAlerta, reconstruir_ruta
+from codigo_fuente.simulacion_alerta import SimuladorAlerta
 
 from codigo_fuente.dijkstra import ruta_optima
 from codigo_fuente.respaldos import seleccionar_respaldos

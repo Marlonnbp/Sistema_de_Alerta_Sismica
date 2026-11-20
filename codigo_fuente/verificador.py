@@ -1,19 +1,22 @@
 from codigo_fuente.lista_enlazada import ListaEnlazada
+from codigo_fuente.tabla_hash import TablaHash
 
 
 def _construir_adyacencia(ids, aristas):
-    adyacencia = {id_sensor: ListaEnlazada() for id_sensor in ids}
+    adyacencia = TablaHash()
+    for id_sensor in ids:
+        adyacencia.insertar(id_sensor, ListaEnlazada())
     for arista in aristas:
-        adyacencia[arista.origen].agregar_al_final(arista.destino)
-        adyacencia[arista.destino].agregar_al_final(arista.origen)
+        adyacencia.buscar(arista.origen).agregar_al_final(arista.destino)
+        adyacencia.buscar(arista.destino).agregar_al_final(arista.origen)
     return adyacencia
 
 
 def _dfs(adyacencia, actual, padre, visitados):
-    visitados.add(actual)
+    visitados.insertar(actual, True)
     hay_ciclo = False
-    for vecino in adyacencia[actual]:
-        if vecino not in visitados:
+    for vecino in adyacencia.buscar(actual):
+        if not visitados.contiene(vecino):
             if _dfs(adyacencia, vecino, actual, visitados):
                 hay_ciclo = True
         elif vecino != padre:
@@ -26,17 +29,17 @@ def es_conexo(ids, aristas):
     if not ids:
         return True
     adyacencia = _construir_adyacencia(ids, aristas)
-    visitados = set()
+    visitados = TablaHash()
     _dfs(adyacencia, ids[0], None, visitados)
-    return len(visitados) == len(ids)
+    return visitados.obtener_tamano() == len(ids)
 
 
 def tiene_ciclos(ids, aristas):
     ids = list(ids)
     adyacencia = _construir_adyacencia(ids, aristas)
-    visitados = set()
+    visitados = TablaHash()
     for id_sensor in ids:
-        if id_sensor not in visitados:
+        if not visitados.contiene(id_sensor):
             if _dfs(adyacencia, id_sensor, None, visitados):
                 return True
     return False

@@ -6,7 +6,9 @@ from codigo_fuente.pila import Pila
 from codigo_fuente.automata_sensor import (
     AutomataSensor, REPOSO, VIGILANCIA, ALERTA, umbral_de_suelo,
 )
-from codigo_fuente.simulacion_alerta import SimuladorAlerta, reconstruir_ruta
+from codigo_fuente.simulacion_alerta import SimuladorAlerta
+from codigo_fuente.dijkstra import reconstruir_ruta
+from codigo_fuente.tabla_hash import TablaHash
 
 
 class TestPila(unittest.TestCase):
@@ -70,16 +72,23 @@ class TestAutomata(unittest.TestCase):
             a.procesar("d")  # falta magnitud
 
 
+def _tabla(pares):
+    tabla = TablaHash()
+    for clave, valor in pares:
+        tabla.insertar(clave, valor)
+    return tabla
+
+
 class TestReconstruirRuta(unittest.TestCase):
     def test_ruta(self):
-        pred = {"S05": None, "S04": "S05", "S01": "S04"}
+        pred = _tabla([("S05", None), ("S04", "S05"), ("S01", "S04")])
         self.assertEqual(reconstruir_ruta(pred, "S05", "S01"), ["S05", "S04", "S01"])
 
     def test_origen_igual_destino(self):
-        self.assertEqual(reconstruir_ruta({"S01": None}, "S01", "S01"), ["S01"])
+        self.assertEqual(reconstruir_ruta(_tabla([("S01", None)]), "S01", "S01"), ["S01"])
 
     def test_sin_camino(self):
-        pred = {"S01": None, "S02": None}
+        pred = _tabla([("S01", None), ("S02", None)])
         self.assertIsNone(reconstruir_ruta(pred, "S01", "S02"))
 
 

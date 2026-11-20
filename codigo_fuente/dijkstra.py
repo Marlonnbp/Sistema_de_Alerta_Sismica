@@ -1,20 +1,29 @@
 from codigo_fuente.cola_prioridad import ColaPrioridad
 from codigo_fuente.tabla_hash import TablaHash
-from codigo_fuente.simulacion_alerta import reconstruir_ruta
-
-# Nombres posibles de los atributos de Arista (ajustar si hace falta).
-_NOMBRES_DESTINO = ("destino", "id_destino", "v", "hasta")
-_NOMBRES_COSTO = ("costo", "peso")
+from codigo_fuente.pila import Pila
 
 
-def _leer(arista, nombres):
-    for nombre in nombres:
-        if hasattr(arista, nombre):
-            return getattr(arista, nombre)
-    raise AttributeError(
-        f"Arista no tiene ninguno de estos atributos: {nombres}. "
-        "Ajusta _NOMBRES_DESTINO / _NOMBRES_COSTO en dijkstra.py"
-    )
+def reconstruir_ruta(predecesores, origen, destino):
+    """Reconstruye la ruta origen -> destino con una Pila.
+
+    predecesores: TablaHash {id_sensor: id_del_predecesor}. Devuelve la lista de
+    ids en orden, o None si el destino no es alcanzable desde el origen.
+    """
+    pila = Pila()
+    actual = destino
+    while actual is not None:
+        pila.apilar(actual)
+        if actual == origen:
+            break
+        actual = predecesores.buscar(actual)
+
+    if pila.ver_tope() != origen:
+        return None
+
+    ruta = []
+    while not pila.esta_vacia():
+        ruta.append(pila.desapilar())
+    return ruta
 
 
 def dijkstra(grafo, id_origen, id_destino=None):
@@ -42,8 +51,8 @@ def dijkstra(grafo, id_origen, id_destino=None):
             break
 
         for arista in grafo.obtener_vecinos(actual):
-            vecino = _leer(arista, _NOMBRES_DESTINO)
-            costo = _leer(arista, _NOMBRES_COSTO)
+            vecino = arista.destino
+            costo = arista.costo
 
             if costo <= 0:
                 raise ValueError(
@@ -76,6 +85,3 @@ def crear_calcular_ruta(grafo_operativo):
     def calcular_ruta(id_origen, id_destino):
         return ruta_optima(grafo_operativo, id_origen, id_destino)
     return calcular_ruta
-
-
-

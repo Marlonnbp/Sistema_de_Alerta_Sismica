@@ -1,26 +1,7 @@
-from codigo_fuente.pila import Pila
+from codigo_fuente.tabla_hash import TablaHash
 from codigo_fuente.automata_sensor import (
     AutomataSensor, ALERTA, ENTRADA_D, ENTRADA_R, ENTRADA_T,
 )
-
-
-def reconstruir_ruta(predecesores, origen, destino):
-    obtener = predecesores.buscar if hasattr(predecesores, "buscar") else predecesores.get
-    pila = Pila()
-    actual = destino
-    while actual is not None:
-        pila.apilar(actual)
-        if actual == origen:
-            break
-        actual = obtener(actual)
-
-    if pila.ver_tope() != origen:
-        return None  
-
-    ruta = []
-    while not pila.esta_vacia():
-        ruta.append(pila.desapilar())
-    return ruta
 
 
 class ReporteAlerta:
@@ -60,15 +41,15 @@ class SimuladorAlerta:
 
     def __init__(self, sensores, calcular_ruta):
         self._calcular_ruta = calcular_ruta
-        self._automatas = {}
+        self._automatas = TablaHash()
         for id_sensor, tipo_suelo in sensores:
             self._automatas[id_sensor] = AutomataSensor(id_sensor, tipo_suelo)
 
     def automata(self, id_sensor):
-        return self._automatas[id_sensor]
+        return self._automatas.buscar(id_sensor)
 
     def reiniciar(self):
-        for automata in self._automatas.values():
+        for automata in self._automatas:
             automata.procesar(ENTRADA_T)
 
     def simular_evento(self, id_sensor, magnitud, id_sede):
@@ -81,7 +62,7 @@ class SimuladorAlerta:
 
         self.reiniciar()  
 
-        origen = self._automatas[id_sensor]
+        origen = self._automatas.buscar(id_sensor)
         origen.procesar(ENTRADA_D, magnitud)
         reporte = ReporteAlerta(id_sensor, magnitud, origen.umbral, origen.estado)
 
@@ -103,7 +84,7 @@ class SimuladorAlerta:
         reporte.alertados = [id_sensor]
 
         for id_siguiente in ruta[1:]:
-            siguiente = self._automatas[id_siguiente]
+            siguiente = self._automatas.buscar(id_siguiente)
             if siguiente.estado != ALERTA:
                 siguiente.procesar(ENTRADA_R)
                 reporte.alertados.append(id_siguiente)
