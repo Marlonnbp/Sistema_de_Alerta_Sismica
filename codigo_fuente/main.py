@@ -129,7 +129,7 @@ class SistemaSASPe:
         enlaces = calcular_costos_enlaces(self.grafo.vertices, predictor=predictor)
         self.grafo.aristas = ListaEnlazada()
         for sensor in self.grafo.vertices:
-            self.grafo.adyacencias[sensor.id] = ListaEnlazada()
+            self.grafo.adyacencias.insertar(sensor.id, ListaEnlazada())
 
         for id_u, id_v, costo in enlaces:
             self.grafo.agregar_arista(id_u, id_v, costo)
